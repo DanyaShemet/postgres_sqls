@@ -1,0 +1,17 @@
+{
+  "name": "basic-express-app",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Basic Express.js app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "pg": "^8.20.0"
+  }
+}
