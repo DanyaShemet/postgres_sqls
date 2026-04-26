@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
-  "description": "Basic Express.js app",
+  "description": "Express + PostgreSQL learning project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
