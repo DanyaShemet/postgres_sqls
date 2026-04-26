@@ -1,7 +1,46 @@
+import { env } from '../config/env.js';
 import { pool } from './pool.js';
 
-export function query(text, params = []) {
-  return pool.query(text, params);
+function normalizeSql(text) {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+function logQuery(level, payload) {
+  if (!env.db.logQueries) {
+    return;
+  }
+
+  const logger = level === 'error' ? console.error : console.log;
+  logger('[db.query]', payload);
+}
+
+export async function query(text, params = []) {
+  const startedAt = performance.now();
+
+  try {
+    const result = await pool.query(text, params);
+    const durationMs = Number((performance.now() - startedAt).toFixed(2));
+
+    logQuery('info', {
+      durationMs,
+      rowCount: result.rowCount,
+      sql: normalizeSql(text),
+      params,
+    });
+
+    return result;
+  } catch (error) {
+    const durationMs = Number((performance.now() - startedAt).toFixed(2));
+
+    logQuery('error', {
+      durationMs,
+      sql: normalizeSql(text),
+      params,
+      error: error.message,
+    });
+
+    throw error;
+  }
 }
 
 export async function withTransaction(callback) {

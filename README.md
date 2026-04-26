@@ -59,8 +59,63 @@ DB_POOL_MAX=10
 
 ```bash
 npm install
+npm run migrate
 npm run dev
 ```
+
+## Migrations
+
+SQL migrations live in `migrations/` and are applied in filename order.
+
+Current migrations:
+
+- `001_create_users_table.sql`
+- `002_create_posts_table.sql`
+- `003_create_comments_table.sql`
+- `004_add_email_to_users.sql`
+
+To apply them:
+
+```bash
+npm run migrate
+```
+
+Applied migrations are tracked in the `schema_migrations` table.
+
+## Tests
+
+Tests use a real PostgreSQL database, not mocks.
+
+Create `.env.test` from `.env.test.example`, point it to a separate test database, and run:
+
+```bash
+npm test
+```
+
+The test flow is:
+
+- load `.env.test`
+- run migrations against the test database
+- truncate `comments`, `posts`, and `users` before each test
+- execute repository and service tests against real SQL
+
+## Measuring execution time
+
+If you want to measure work inside a service, use `timedOperation` from `src/utils/timed-operation.js`.
+
+Example:
+
+```js
+import { timedOperation } from '../utils/timed-operation.js';
+
+const posts = await timedOperation(
+  'postsService.listPosts',
+  () => postsRepository.getAllPosts(),
+  { userId: 3 },
+);
+```
+
+It logs execution time in milliseconds and works for any async block, not only SQL queries.
 
 ## API
 
@@ -109,7 +164,7 @@ npm run dev
 
 ## Expected tables
 
-This code assumes you already have these tables:
+This code creates these tables:
 
 - `users(id, name)`
 - `posts(id, title, user_id)`
